@@ -1,0 +1,12 @@
+# 의존성
+node_modules
+
+# 작업 자료 (git 추적 대상 아님)
+_workspace
+
+# 락 파일
+*.lock
+pnpm-lock.yaml
+
+# 시스템 파일
+.DS_Store
