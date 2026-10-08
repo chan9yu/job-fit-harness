@@ -1,0 +1,6 @@
+resume/*
+!resume/.gitkeep
+output/
+_workspace*/
+.DS_Store
+node_modules/
