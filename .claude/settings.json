@@ -1,0 +1,5 @@
+{
+	"permissions": {
+		"allow": ["WebSearch", "WebFetch", "Bash(curl:*)", "Bash(jq:*)", "Bash(shasum:*)", "mcp__claude-in-chrome"]
+	}
+}
