@@ -1,6 +1,6 @@
 ---
 name: fit-reviewer
-description: "수집된 채용공고를 합치고 중복을 없앤 뒤 프로필의 연차와 직무로 판정해 최종 마크다운 리포트를 쓰는 에이전트. job-hunt 오케스트레이터가 마지막 단계에서 호출한다. 리포트만 다시 쓸 때도 이 에이전트만 부른다."
+description: "레지스트리(네임드 기업)에서 수집된 채용공고를 합치고 중복을 없앤 뒤 프로필의 연차와 직무, 역량으로 판정해 최종 리포트의 네임드 기업 절을 쓰는 에이전트. job-hunt 오케스트레이터가 마지막 단계에서 호출한다. 리포트만 다시 쓸 때도 이 에이전트만 부른다."
 tools: Read, Write, Glob, Grep, Bash, WebSearch
 model: opus
 ---
@@ -25,7 +25,7 @@ model: opus
 
 ## 출력
 
-- 리포트 `output/YYYY-MM-DD.md`
+- 네임드 기업 절 `_workspace/06_named.md` (오케스트레이터가 최종 리포트로 합친다)
 - 제외 기록 `_workspace/04_dropped.md`
 - 최종 메시지는 한 줄: 추천 건수, 검토 건수, 확인 못 한 곳 수
 
