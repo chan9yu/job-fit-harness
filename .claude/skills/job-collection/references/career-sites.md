@@ -508,6 +508,7 @@ GET https://careers.nhn.com/v1/job-postings?page=0&size=100
 
 - 공고는 `.result[]`, 전체 건수는 `.paging.totalSize`다. 기본 size가 30이라 100을 넣는다.
 - 계열사는 `.corporation.name`으로 나눈다. 특정 계열사만 받으려면 `corporationId`를 붙인다(NHN 3616135421038421042, NHN Cloud 3647229949742220183, 목록은 `GET /v1/corporations`).
+- 게시 중인 공고만 쓴다. `postingYn`이 Y이고 `finishYn`이 N이어야 한다. 마감일(`postingEndDatetime`)이 2999년이어도 게시가 내려간 공고가 있다. 상세 API는 내려간 공고도 응답하므로 상세로 확인할 때도 두 값을 본다.
 - 개발 직군은 `jobGroupId=3645799730550663017`(Tech). 경력은 `.careerType.cd`(B003 경력, B002 신입, B001 무관). 마감은 `postingEndDatetime`.
 - 공고 링크는 `https://careers.nhn.com/recruits/{id}`. 목록의 `jobPostingContentsItems`는 null이라 자격요건은 `GET https://careers.nhn.com/v1/job-postings/{id}`의 `result.jobPostingContentsItems`에서 읽는다. NHN KCP는 이 사이트에 없다.
 
