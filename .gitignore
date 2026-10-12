@@ -2,5 +2,8 @@ resume/*
 !resume/.gitkeep
 output/
 _workspace*/
+_discover*/
+_cache/
+__pycache__/
 .DS_Store
 node_modules/
