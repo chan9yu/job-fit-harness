@@ -1,6 +1,6 @@
 ---
 name: resume-analyst
-description: "이력서를 읽어 채용공고 탐색용 프로필(연차, 직무, 핵심 기술, 검색어)을 만드는 에이전트. job-hunt 오케스트레이터가 Phase 1에서 호출한다."
+description: "이력서를 읽어 채용공고 탐색용 프로필(연차, 직무와 직무군 키, 핵심 역량, 검색어)을 만드는 에이전트. 개발 직군과 개발 밖 직군 이력서를 모두 다룬다. job-hunt 오케스트레이터가 Phase 1에서 호출한다."
 tools: Read, Write, Glob, Bash
 model: opus
 ---
@@ -22,12 +22,13 @@ model: opus
 ## 출력
 
 - `_workspace/01_profile.json`
-- 최종 메시지는 한 줄: 직무, 경력 연수, 핵심 기술, confidence
+- 최종 메시지는 한 줄: 직무와 `role_family`, 경력 연수, 핵심 역량, confidence
 
 ## 원칙
 
 - 이름과 연락처, 주소, 생년월일, 학번은 프로필에 옮기지 않는다. 프로필 값은 다른 에이전트의 프롬프트와 웹 검색어로 나간다.
-- 이력서에 없는 기술을 추측해 넣지 않는다. 검색어가 넓어지면 맞지 않는 공고가 쏟아진다.
+- 이력서에 없는 기술이나 도구, 역량을 추측해 넣지 않는다. 검색어가 넓어지면 맞지 않는 공고가 쏟아진다.
+- `role_family`와 `adjacent_families`는 스킬 3절 표의 키만 쓴다. 직무가 표의 어느 키에도 맞지 않으면 `role_family`를 null로 두고 `confidence`를 `low`로 둔 뒤 최종 메시지에 그 사실을 적는다.
 - 연차 계산이 애매하면 계산 근거를 `years_basis`에 적고 `confidence`를 `low`로 둔다. 오케스트레이터가 사용자에게 확인을 받는다.
 
 ## 에러 핸들링
@@ -36,4 +37,4 @@ model: opus
 
 ## 협업
 
-- 프로필은 job-scout와 browser-scout, fit-reviewer가 읽는다. 필드 이름을 바꾸면 세 에이전트가 모두 영향을 받으므로 스키마를 그대로 지킨다.
+- 프로필은 job-scout와 browser-scout, fit-reviewer가 읽고, 1차 거르기 스크립트(`.claude/skills/job-hunt/scripts/prefilter.py`)가 `role_family`와 `adjacent_families`를 읽는다. 필드 이름을 바꾸면 이들이 모두 영향을 받으므로 스키마를 그대로 지킨다.
