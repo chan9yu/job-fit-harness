@@ -234,6 +234,16 @@ def check_role_families():
 	assert prefilter.title_verdict("퍼포먼스 마케터", pm, pf) == (None, "exact")  # 인접 직무군
 	assert prefilter.title_verdict("npm 라이브러리 개발자", pm, pf) == ("직무 판단 불가", None)
 	assert prefilter.title_verdict("운영 매니저", pm, pf) == ("직무 불일치(operations)", None)
+	# 2026-10-13 기획자 이력서 케이스에서 직무 판단 불가로 빠졌던 제목
+	for title in ["프로덕트 기획자 (5~8년차)", "UX기획 리더급", "Product Planning Lead", "웹 플랫폼 기획 경력직 채용 공고"]:
+		assert prefilter.title_verdict(title, pm, pf) == (None, "exact"), title
+	for title in ["환급 서비스 운영 기획자", "[LF] IT기획(구매/생산, 수출입시스템)"]:
+		assert prefilter.title_verdict(title, pm, pf) == (None, "generic"), title
+	assert prefilter.title_verdict("프로덕트 기획자", PROFILE, fe) == ("직무 불일치(product_manager)", None)  # 개발 프로필에는 남지 않는다
+
+	ds = {"product_designer"}
+	assert prefilter.title_verdict("Product Design Lead", designer, ds) == (None, "exact")
+	assert prefilter.title_verdict("Design Lead", designer, ds) == (None, "generic")
 
 	hr = {"role": "인사", "role_family": "hr", "adjacent_families": []}
 	assert prefilter.title_verdict("인사 담당자", hr, {"hr"}) == (None, "exact")

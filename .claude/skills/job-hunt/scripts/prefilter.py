@@ -32,8 +32,8 @@ ROLE_FAMILIES = {
 	"qa": ["qa", "quality assurance", "테스트 엔지니어", "sdet", "테스터"],
 	"security": ["보안", "security", "cybersecurity", "infosec", "정보보호", "모의해킹"],
 	"game_dev": ["게임 클라이언트", "게임 서버", "게임 개발", "게임 프로그래머", "클라이언트 개발", "클라이언트 엔지니어", "클라이언트 프로그래머", "서버 프로그래머", "엔진 프로그래머", "게임플레이", "gameplay", "game client", "game server", "game developer", "game engineer", "client engineer", "client programmer", "유니티", "unity", "언리얼", "unreal", "ue4", "ue5"],
-	"product_manager": ["서비스 기획", "웹 기획", "앱 기획", "프로덕트 매니저", "product manager", "프로덕트 오너", "product owner", "pm", "po"],
-	"product_designer": ["프로덕트 디자", "product designer", "ux 디자", "ux designer", "ux 리서", "ux research", "ux 라이터", "ux writer", "ui 디자", "ui designer", "gui 디자", "ui ux", "ux ui", "ui/ux", "ux/ui", "웹 디자", "web designer", "앱 디자", "모바일 디자", "서비스 디자"],
+	"product_manager": ["서비스 기획", "웹 기획", "앱 기획", "프로덕트 기획", "플랫폼 기획", "ux 기획", "product planning", "product planner", "프로덕트 매니저", "product manager", "프로덕트 오너", "product owner", "pm", "po"],
+	"product_designer": ["프로덕트 디자", "product designer", "product design", "ux 디자", "ux designer", "ux 리서", "ux research", "ux 라이터", "ux writer", "ui 디자", "ui designer", "gui 디자", "ui ux", "ux ui", "ui/ux", "ux/ui", "웹 디자", "web designer", "앱 디자", "모바일 디자", "서비스 디자"],
 	"visual_designer": ["그래픽 디자", "graphic designer", "브랜드 디자", "브랜딩 디자", "brand designer", "bx", "bi/bx", "시각 디자", "visual designer", "비주얼 디자", "편집 디자", "광고 디자", "영상 디자", "모션 디자", "motion designer", "콘텐츠 디자", "패키지 디자", "상세페이지 디자", "크리에이티브 디자", "일러스트"],
 	"data_analyst": ["데이터 분석", "data analyst", "data analytics", "데이터 사이언티스트", "데이터 사이언스", "data scientist", "data science", "bi 분석", "business analyst"],
 	"marketing": ["마케팅", "마케터", "marketing", "marketer", "그로스 해커", "growth hacker", "광고 기획", "브랜드 매니저", "brand manager", "홍보", "pr"],
@@ -47,8 +47,9 @@ ROLE_FAMILIES = {
 # 제목만으로 직무가 애매한 말. 프로필 직무군이 개발, 디자인, 그 밖 중 어디에 속하느냐에 따라 고른다.
 GENERIC = {
 	"dev": ["개발자", "개발", "엔지니어", "engineer", "developer", "software", "sw", "프로그래머"],
-	"design": ["디자이너", "디자인", "designer"],
-	"business": ["매니저", "담당자", "manager"],
+	"design": ["디자이너", "디자인", "designer", "design"],
+	# 기획자 공고는 "운영 기획자", "IT기획"처럼 앞말이 제각각이라 기획만 있으면 남기고 판정에서 거른다
+	"business": ["매니저", "담당자", "manager", "기획"],
 }
 DESIGN_FAMILIES = {"product_designer", "visual_designer"}
 BUSINESS_FAMILIES = {"product_manager", "data_analyst", "marketing", "business_development", "operations", "hr", "finance", "legal", "merchandiser"}
@@ -106,7 +107,12 @@ def has_any(text, words):
 	"""ROLE_FAMILIES 위 주석의 규칙으로 text에 words 중 하나가 있는지 본다. text는 text_key를 거친 값이다."""
 	for w in words:
 		w = text_key(w).strip()
-		if w and re.search(r"(?<![a-z])" + re.escape(w).replace(r"\ ", r"\s*") + r"(?![a-z])", text):
+		if not w:
+			continue
+		# 라틴 문자 경계는 말이 라틴 문자로 시작하거나 끝나는 쪽에만 건다. 'IT기획'의 '기획'처럼 한글 말 앞에 붙은 영문은 막지 않는다
+		head = r"(?<![a-z])" if w[0].isascii() and w[0].isalpha() else ""
+		tail = r"(?![a-z])" if w[-1].isascii() and w[-1].isalpha() else ""
+		if re.search(head + re.escape(w).replace(r"\ ", r"\s*") + tail, text):
 			return True
 	return False
 
