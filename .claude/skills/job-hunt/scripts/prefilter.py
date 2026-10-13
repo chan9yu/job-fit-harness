@@ -57,6 +57,8 @@ BLIND = re.compile(r"헤드헌|서치펌|써치펌|비공개|국내 ?대기업|�
 # 경력 원문에 연차를 대신할 수 있다는 문구가 있으면 --allow-equivalent일 때 연차가 모자라도 남긴다
 EQUIVALENT = re.compile(r"동등|준하는|이에\s*준|equivalent", re.I)
 NON_REGULAR = {"계약직", "인턴", "파견", "아르바이트", "프리랜서"}
+# 원티드처럼 목록에 고용형태가 없는 플랫폼은 제목으로 본다. 휴직 대체는 계약직이다
+TITLE_EMPLOYMENT = [(re.compile(r"계약직|(?:육아|출산|산전|산휴)\s*(?:휴직)?\s*대체"), "계약직"), (re.compile(r"인턴"), "인턴"), (re.compile(r"파견"), "파견"), (re.compile(r"아르바이트|알바"), "아르바이트"), (re.compile(r"프리랜서"), "프리랜서")]
 
 
 def clean(name):
@@ -153,8 +155,11 @@ def drop_reason(p, ctx):
 		return "레지스트리 기업(네임드 범위)", None
 	if BLIND.search(p.get("company") or "") or "헤드헌팅" in (p.get("title") or ""):
 		return "헤드헌팅 또는 회사명 비공개", None
-	if p.get("employment") in NON_REGULAR and not ctx["allow_contract"]:
-		return "고용형태 " + p["employment"], None
+	kind = p.get("employment")
+	if kind not in NON_REGULAR and kind != "정규직":
+		kind = next((k for pat, k in TITLE_EMPLOYMENT if pat.search(p.get("title") or "")), kind)
+	if kind in NON_REGULAR and not ctx["allow_contract"]:
+		return "고용형태 " + kind, None
 	deadline = p.get("deadline") or ""
 	if re.fullmatch(r"\d{4}-\d{2}-\d{2}", deadline) and deadline < ctx["today"]:
 		return "마감 지남", None
