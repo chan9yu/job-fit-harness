@@ -4,7 +4,7 @@ _discover/02_postings_*.json을 읽어 회사 검증에 넘길 후보만 남긴�
 레지스트리 기업, 제외 기업, 헤드헌팅, 계약직, 연차 범위 밖, 직무가 분명히 다른 공고를 뺀다.
 애매한 공고는 남긴다. 최종 판정은 discovery-reviewer가 한다.
 
-사용: python3 prefilter.py --workspace _discover --registry data/companies.md [--today YYYY-MM-DD] [--allow-contract]
+사용: python3 prefilter.py --workspace _discover --registry data/companies.md [--today YYYY-MM-DD] [--allow-contract] [--allow-equivalent]
 """
 
 import argparse
@@ -53,6 +53,8 @@ GENERIC = {
 DESIGN_FAMILIES = {"product_designer", "visual_designer"}
 BUSINESS_FAMILIES = {"product_manager", "data_analyst", "marketing", "business_development", "operations", "hr", "finance", "legal", "merchandiser"}
 BLIND = re.compile(r"헤드헌|서치펌|써치펌|비공개|국내 ?대기업|외국계 ?기업|유망 ?스타트업|중견 ?기업|코스닥 ?상장사")
+# 경력 원문에 연차를 대신할 수 있다는 문구가 있으면 --allow-equivalent일 때 연차가 모자라도 남긴다
+EQUIVALENT = re.compile(r"동등|준하는|이에\s*준|equivalent", re.I)
 NON_REGULAR = {"계약직", "인턴", "파견", "아르바이트", "프리랜서"}
 
 
@@ -151,17 +153,18 @@ def drop_reason(p, ctx):
 	if re.fullmatch(r"\d{4}-\d{2}-\d{2}", deadline) and deadline < ctx["today"]:
 		return "마감 지남", None
 	y = ctx["years"]
-	if p.get("min_years") is not None and p["min_years"] > y + 2:
+	equivalent = ctx["allow_equivalent"] and EQUIVALENT.search(p.get("experience_raw") or "")
+	if p.get("min_years") is not None and p["min_years"] > y + 2 and not equivalent:
 		return "요건 %s년 이상" % p["min_years"], None
 	if p.get("max_years") is not None and p["max_years"] < y - 2:
 		return "요건 %s년 이하" % p["max_years"], None
 	return title_verdict(p.get("title"), ctx["profile"], ctx["families"])
 
 
-def run(workspace, registry_path, today, allow_contract=False):
+def run(workspace, registry_path, today, allow_contract=False, allow_equivalent=False):
 	profile = json.load(open(os.path.join(workspace, "01_profile.json"), encoding="utf-8"))
 	registry, excluded = parse_registry(registry_path)
-	ctx = {"registry": registry, "excluded": excluded, "today": today, "years": float(profile["years"]), "profile": profile, "families": profile_families(profile), "allow_contract": allow_contract}
+	ctx = {"registry": registry, "excluded": excluded, "today": today, "years": float(profile["years"]), "profile": profile, "families": profile_families(profile), "allow_contract": allow_contract, "allow_equivalent": allow_equivalent}
 	seen, companies, dropped = set(), {}, []
 	for path in sorted(glob.glob(os.path.join(workspace, "02_postings_*.json"))):
 		for p in json.load(open(path, encoding="utf-8")).get("postings", []):
@@ -189,7 +192,8 @@ if __name__ == "__main__":
 	ap.add_argument("--registry", default="data/companies.md")
 	ap.add_argument("--today", default=datetime.date.today().isoformat())
 	ap.add_argument("--allow-contract", action="store_true")
+	ap.add_argument("--allow-equivalent", action="store_true")
 	a = ap.parse_args()
-	res, drop = run(a.workspace, a.registry, a.today, a.allow_contract)
+	res, drop = run(a.workspace, a.registry, a.today, a.allow_contract, a.allow_equivalent)
 	kept = sum(len(c["postings"]) for c in res["companies"])
 	print("후보 기업 %d곳, 공고 %d건, 1차 제외 %d건" % (len(res["companies"]), kept, len(drop)))

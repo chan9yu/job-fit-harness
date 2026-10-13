@@ -81,6 +81,18 @@ def main():
 	assert good["company"] == "(주)좋은회사" and good["score"] == 3, good
 	assert [p["match"] for p in good["postings"]] == ["exact", "generic"], good
 
+	# 동등역량: 기본은 연차 규칙대로 빼고, --allow-equivalent면 경력 원문에 그 문구가 있는 공고만 남긴다
+	d4 = tempfile.mkdtemp()
+	json.dump(PROFILE, open(os.path.join(d4, "01_profile.json"), "w"), ensure_ascii=False)
+	json.dump({"postings": [
+		posting("동등회사", "프론트엔드 개발자", min_years=10, experience_raw="10년 이상 또는 이에 준하는 역량"),
+		posting("엄격회사", "프론트엔드 개발자", min_years=10, experience_raw="10년 이상"),
+	]}, open(os.path.join(d4, "02_postings_d-test.json"), "w"), ensure_ascii=False)
+	res, dropped = prefilter.run(d4, reg, "2026-10-12")
+	assert res["companies"] == [] and len(dropped) == 2, dropped
+	res, dropped = prefilter.run(d4, reg, "2026-10-12", allow_equivalent=True)
+	assert [c["company"] for c in res["companies"]] == ["동등회사"] and [x["company"] for x in dropped] == ["엄격회사"], (res, dropped)
+
 	# 캐시: 좋은회사는 10일 전 검증이라 재사용, KTB네트워크는 40일 전이라 다시 검증
 	cache = os.path.join(d, "cache", "vetting.json")
 	os.makedirs(os.path.dirname(cache))
