@@ -8,6 +8,7 @@ _discover/02_postings_*.json을 읽어 회사 검증에 넘길 후보만 남긴�
 """
 
 import argparse
+import collections
 import datetime
 import glob
 import json
@@ -212,3 +213,6 @@ if __name__ == "__main__":
 	res, drop = run(a.workspace, a.registry, a.today, a.allow_contract, a.allow_equivalent)
 	kept = sum(len(c["postings"]) for c in res["companies"])
 	print("후보 기업 %d곳, 공고 %d건, 1차 제외 %d건" % (len(res["companies"]), kept, len(drop)))
+	# discovery-reviewer 프롬프트에 그대로 넘기는 사유별 건수. 연차 숫자는 묶는다
+	counts = collections.Counter(re.sub(r"\d+", "N", x["reason"]) for x in drop)
+	print("사유별: " + ", ".join("%s %d" % (r, n) for r, n in counts.most_common()))
