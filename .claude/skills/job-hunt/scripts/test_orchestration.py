@@ -49,17 +49,20 @@ def main():
 	total, new = assemble_report.assemble(out, os.path.join(d, "p.json"), os.path.join(d, "s.json"), os.path.join(d, "n.md"), os.path.join(d, "d.md"), "2026-10-12")
 	text = open(out, encoding="utf-8").read()
 	assert (total, new) == (3, 2), (total, new)
-	assert text.startswith("# 채용공고 2026-10-12\n\n프론트엔드 경력 5년 기준. 범위: 빅테크, 성장 스타트업. 공고 3건 (신규 2건)\n\n## 네임드 기업"), text[:200]
+	assert text.startswith("# 채용공고 2026-10-12\n\n프론트엔드 경력 5년 기준. 범위: 빅테크, 성장 스타트업. 공고 3건 (신규 2건)\n\n추천은 "), text[:200]
+	assert assemble_report.GUIDE_NAMED in text and assemble_report.GUIDE_DISCOVER in text and "\n\n## 네임드 기업" in text, text[:600]
 	assert "## 레지스트리 밖 회사" in text, text
 
 	# 네임드만 고른 경우: 레지스트리 밖 절 파일이 없어도 동작한다
 	json.dump({"named": ["빅테크"], "discover": []}, open(os.path.join(d, "s.json"), "w"), ensure_ascii=False)
 	total, new = assemble_report.assemble(out, os.path.join(d, "p.json"), os.path.join(d, "s.json"), os.path.join(d, "n.md"), os.path.join(d, "missing.md"), "2026-10-12")
-	assert (total, new) == (2, 1) and "레지스트리 밖" not in open(out, encoding="utf-8").read()
+	text = open(out, encoding="utf-8").read()
+	assert (total, new) == (2, 1) and "레지스트리 밖" not in text and "등급은" not in text and assemble_report.GUIDE_NAMED in text, text[:600]
 
 	# 절이 하나도 없으면 한 줄 안내
 	assemble_report.assemble(out, os.path.join(d, "p.json"), os.path.join(d, "s.json"), None, None, "2026-10-12")
-	assert "찾지 못했다" in open(out, encoding="utf-8").read()
+	text = open(out, encoding="utf-8").read()
+	assert "찾지 못했다" in text and "추천은" not in text, text
 
 	# 배치: 고른 절만, 그룹 행은 배치마다 나누고 계열사 행을 붙인다
 	reg = os.path.join(d, "companies.md")
