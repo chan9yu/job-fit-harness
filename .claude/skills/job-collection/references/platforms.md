@@ -118,7 +118,7 @@ curl -s -X POST https://career-api.rememberapp.co.kr/job_postings/search \
 
 ## 점핏
 
-- 목록: `GET https://jumpit-api.saramin.co.kr/api/positions?jobCategory=2&career={y}&sort=rsp_rate&page=1`. `jobCategory=2`가 프론트엔드다. 다른 개발 직무는 직무 코드표의 점핏 값을 쓴다. 점핏은 개발 직군 공고만 있어서 프로필이 개발 밖 직군이면 건너뛴다.
+- 목록: `GET https://jumpit-api.saramin.co.kr/api/positions?jobCategory=2&career={y}&sort=rsp_rate&page=1`. `jobCategory=2`가 프론트엔드다. 다른 개발 직무는 직무 코드표의 점핏 값을 쓴다. 점핏은 개발 직군 공고가 대부분이라 직무 코드표에 점핏 값이 없는 직무군이면 건너뛴다. 서비스 기획처럼 값이 있으면 그 코드로 받는다.
 - 상세: `GET https://jumpit-api.saramin.co.kr/api/position/{id}`. `minCareer`, `maxCareer`, `closedAt`("2026-10-10 23:59:59" 형식), `alwaysOpen`.
 - 공고 링크: `https://jumpit.saramin.co.kr/position/{id}`
 
