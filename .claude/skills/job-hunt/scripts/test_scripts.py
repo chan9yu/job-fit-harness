@@ -80,6 +80,10 @@ def main():
 	good = res["companies"][0]
 	assert good["company"] == "(주)좋은회사" and good["score"] == 3, good
 	assert [p["match"] for p in good["postings"]] == ["exact", "generic"], good
+
+	# 회사명 괄호 표기와 전각 괄호는 같은 회사로 본다
+	assert prefilter.norm("원프레딕트(onepredict)") == prefilter.norm("원프레딕트") == prefilter.norm("（주）원프레딕트"), prefilter.norm("원프레딕트(onepredict)")
+
 	# 고용형태가 비어 있으면 제목으로 본다(원티드)
 	ctx = {"registry": set(), "excluded": set(), "today": "2026-10-13", "years": 5.0, "profile": PROFILE, "families": {"frontend"}, "allow_contract": False, "allow_equivalent": False}
 	assert prefilter.drop_reason(posting("가", "프론트엔드 개발자 (계약직)", employment="미기재"), ctx) == ("고용형태 계약직", None)

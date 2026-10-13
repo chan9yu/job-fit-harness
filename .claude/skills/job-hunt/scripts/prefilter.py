@@ -63,7 +63,11 @@ TITLE_EMPLOYMENT = [(re.compile(r"계약직|(?:육아|출산|산전|산휴)\s*(?
 
 def clean(name):
 	"""법인 표기를 지우고 공백을 하나로 줄인 소문자 이름. 이름 비교에 쓴다."""
-	name = re.sub(r"\(주\)|㈜|주식회사|\(유\)|유한회사", "", name or "")
+	name = (name or "").replace("（", "(").replace("）", ")")
+	name = re.sub(r"\(주\)|㈜|주식회사|\(유\)|유한회사", "", name)
+	# '원프레딕트(onepredict)'처럼 괄호로 덧붙인 다른 표기는 지운다. 괄호 안만 남는 이름은 그대로 둔다
+	stripped = re.sub(r"\([^)]*\)", "", name)
+	name = stripped if stripped.strip() else name
 	return re.sub(r"\s+", " ", name).strip().lower()
 
 
