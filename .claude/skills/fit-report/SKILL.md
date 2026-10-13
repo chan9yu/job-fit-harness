@@ -62,6 +62,8 @@ description: '레지스트리(네임드 기업)에서 수집한 채용공고 JSO
 | 그 밖                                                    | 제외                                                                                                                                             |
 | `min_years`, `max_years` 모두 없음                       | 제목으로 본다. "신입", "주니어", "Junior"인데 `y ≥ 3`이면 제외. "리드", "Lead", "Head", "Principal", "Staff"인데 `y < 7`이면 경계. 나머지는 맞음 |
 
+경력 원문(`experience_raw`)에 "또는 동등 역량", "이에 준하는 경력", "or equivalent"처럼 연차를 대신할 수 있다는 문구가 있어도 기본은 위 표대로다. 프로필 `notes`에 준하는 경력(동등역량) 공고도 본다고 적혀 있을 때만 `min_years > y + 2`인 공고를 제외하지 않고 경계로 두고 걸리는 점에 "요건 N년, 동등역량"을 적는다. 어느 경우든 `y < min_years`면 연차 맞음이 아니므로 추천에 올리지 않는다.
+
 **직무**: 제목이나 주요 업무가 프로필 `role`(직무군 `role_family`)이면 일치, `adjacent_roles`(`adjacent_families`)면 인접, 둘 다 아니면 제외. 직함 표기가 회사마다 다르니 주요 업무로 판단한다. 예: "Product Owner"와 "서비스 기획자"는 같은 `product_manager`다. 제목이 `role`과 `adjacent_roles`에 함께 걸리면 일치다("Frontend Platform Engineer"). 제목이 직무를 특정하지 않는 일반 직함(Software Engineer, Product Engineer, Design Engineer, 개발자)이거나 프로필 직무를 포함하는 직함(프론트엔드 프로필에 Full Stack)이면 `skills`로 본다. `skills_core`와 하나라도 겹치거나 `skills`가 `null`(상세 미확인)이면 인접이고, 그 밖에는 제외다. 겹쳐도 일치로 올리지 않는다. 제목이 다른 직무군을 가리키면(프론트엔드 프로필에 Backend, iOS, React Native) 제외다.
 
 **역량**: 공고의 `skills`와 프로필 `skills_core`가 겹치는 수를 센다. 같은 기술의 다른 이름(React Query와 TanStack Query, JS와 JavaScript, TS와 TypeScript)은 하나로 센다. 직무에 따라 뜻이 다르다. 개발 직군은 기술 스택, 디자인은 도구와 산출물(Figma, 디자인 시스템), 기획과 마케팅, 영업 같은 직군은 도메인과 도구, 역량(SQL, GA4, B2B SaaS)이다. 공고 `skills`가 빈 배열이면(상세에 역량이 적혀 있지 않으면) 역량 조건은 보지 않는다. `skills`가 `null`이면 상세를 읽지 못한 공고다. 역량을 확인하지 못했으니 직무와 연차가 맞아도 검토로 두고 걸리는 점에 "상세 미확인"을 적는다.

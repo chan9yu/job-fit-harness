@@ -200,7 +200,7 @@ Agent(subagent_type: "fit-reviewer", model: "opus", run_in_background: true, des
    python3 -I .claude/skills/job-hunt/scripts/prefilter.py --workspace _discover --registry data/companies.md
    python3 -I .claude/skills/job-hunt/scripts/vetting_cache.py select --workspace _discover --cache _cache/vetting.json --limit 120
    ```
-   프로필 `notes`에 계약직을 허용한다고 적혀 있으면 `prefilter.py`에 `--allow-contract`를 붙인다. 단계(성장, 초기, 상장사와 중견, 중소)는 회사를 검증한 뒤에야 정해진다. 그래서 레지스트리 밖 범위를 일부만 골라도 검증 대상은 직무 점수순 120곳으로 같고 검증 시간도 줄지 않는다. 상한을 낮추면 고른 단계의 회사가 상한에 밀려 0건이 될 수 있으니 120 아래로 내리지 않는다. 두 스크립트가 출력한 건수를 사용자에게 한 줄로 알린다.
+   프로필 `notes`에 계약직을 허용한다고 적혀 있으면 `prefilter.py`에 `--allow-contract`를, 준하는 경력(동등역량) 공고도 본다고 적혀 있으면 `--allow-equivalent`를 붙인다. 단계(성장, 초기, 상장사와 중견, 중소)는 회사를 검증한 뒤에야 정해진다. 그래서 레지스트리 밖 범위를 일부만 골라도 검증 대상은 직무 점수순 120곳으로 같고 검증 시간도 줄지 않는다. 상한을 낮추면 고른 단계의 회사가 상한에 밀려 0건이 될 수 있으니 120 아래로 내리지 않는다. 두 스크립트가 출력한 건수를 사용자에게 한 줄로 알린다.
 2. 국민연금 가입 사업장 파일을 준비한다. `.claude/skills/company-vetting/references/sources.md` 국민연금 절의 명령으로 최신 판과 12개월 전 판을 `_cache/nps/`에 받는다. 같은 이름 파일이 있으면 받지 않는다. 한 판이 115MB 안팎이고 받는 데 1분 남짓 걸린다. 실패해도 멈추지 않는다. company-vetter가 사람인 기업정보로 대신한다.
 3. `_discover/03_to_vet.json`의 `to_vet`을 15곳 안팎씩 나눠 company-vetter를 한 메시지에서 함께 띄운다. 최대 6개, 모두 백그라운드다. 0곳이면 4로 간다.
    ```
