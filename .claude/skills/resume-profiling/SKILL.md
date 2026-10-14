@@ -114,6 +114,7 @@ description: "이력서(PDF, md, txt, docx)에서 경력 연수와 직무, 직�
 	"locations": [],
 	"include_companies": [],
 	"exclude_companies": [],
+	"preferred_companies": [],
 	"notes": ""
 }
 ```
@@ -138,5 +139,6 @@ description: "이력서(PDF, md, txt, docx)에서 경력 연수와 직무, 직�
 }
 ```
 
-- `locations`, `include_companies`, `exclude_companies`는 `preferences.md`에서만 채운다. 없으면 빈 배열이다. 빈 `locations`는 지역 제한이 없다는 뜻이다.
+- `locations`, `include_companies`, `exclude_companies`, `preferred_companies`는 `preferences.md`에서만 채운다. 없으면 빈 배열이다. 빈 `locations`는 지역 제한이 없다는 뜻이다.
+- `preferred_companies`는 "선호 기업"에 적힌 기업 이름을 적힌 순서 그대로 담는다. 여러 줄이면 위 줄부터 이어 붙인다. 네임드 절의 정렬에만 쓰고 판정에는 쓰지 않는다.
 - `notes`에는 판정에 영향을 줄 희망 조건을 한 줄로 적는다. 예: "SI 성격 포지션 제외, 원격 근무 선호, 준하는 경력(동등역량) 공고 포함". 계약직 허용과 준하는 경력 포함은 1차 거르기 옵션으로도 쓰이니 `preferences.md`에 있으면 빠뜨리지 않는다.
