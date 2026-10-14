@@ -66,10 +66,10 @@ def main():
 
 	# 배치: 고른 절만, 그룹 행은 배치마다 나누고 계열사 행을 붙인다
 	reg = os.path.join(d, "companies.md")
-	lines = ["# 대상 기업", "", "## 빅테크", "", "| 기업 | 티어 | 채용 페이지 | ATS | 접근 | 비고 |", "| --- | --- | --- | --- | --- | --- |"]
-	lines += ["| 회사%d | S | https://x/%d | 자체 | api | |" % (i, i) for i in range(30)]
-	lines += ["| 넥슨 | A | https://n | 자체 | browser | |", "", "## 대기업 계열사", "", "| 기업 | 티어 | 채용 페이지 | ATS | 접근 | 비고 |", "| --- | --- | --- | --- | --- | --- |"]
-	lines += ["| 삼성 | | https://s | 자체 | api | 그룹 |", "| 삼성SDS | B | https://s | 자체 | group | 삼성 행. `C60` |", "| LG | | https://l | 자체 | api | 그룹 |", "| LG CNS | B | https://l | 자체 | group | LG 행. `CNS` |"]
+	lines = ["# 대상 기업", "", "## 빅테크", "", "| 기업 | 채용 페이지 | ATS | 접근 | 비고 |", "| --- | --- | --- | --- | --- |"]
+	lines += ["| 회사%d | https://x/%d | 자체 | api | |" % (i, i) for i in range(30)]
+	lines += ["| 넥슨 | https://n | 자체 | browser | |", "", "## 대기업 계열사", "", "| 기업 | 채용 페이지 | ATS | 접근 | 비고 |", "| --- | --- | --- | --- | --- |"]
+	lines += ["| 삼성 | https://s | 자체 | api | 그룹 |", "| 삼성SDS | https://s | 자체 | group | 삼성 행. `C60` |", "| LG | https://l | 자체 | api | 그룹 |", "| LG CNS | https://l | 자체 | group | LG 행. `CNS` |"]
 	open(reg, "w", encoding="utf-8").write("\n".join(lines) + "\n")
 	sm = make_batches.make(reg, ["빅테크"], os.path.join(d, "b1"))
 	assert len(sm["batches"]) == 2 and sum(len(b["companies"]) for b in sm["batches"]) == 30 and sm["browser"] == ["넥슨"], sm

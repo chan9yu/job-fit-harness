@@ -14,10 +14,10 @@ REGISTRY = """# 대상 기업
 
 ## 네카라쿠배당토직야
 
-| 기업 | 티어 | 채용 페이지 | ATS | 접근 | 비고 |
-| --- | --- | --- | --- | --- | --- |
-| 카카오 | A+ | https://careers.kakao.com/jobs | 자체 | api | |
-| KT | B | https://recruit.kt.com/careers | 자체 | api | |
+| 기업 | 채용 페이지 | ATS | 접근 | 비고 |
+| --- | --- | --- | --- | --- |
+| 카카오 | https://careers.kakao.com/jobs | 자체 | api | |
+| KT | https://recruit.kt.com/careers | 자체 | api | |
 
 ## 제외한 기업
 

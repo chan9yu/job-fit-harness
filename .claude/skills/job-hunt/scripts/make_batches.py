@@ -11,7 +11,7 @@ import json
 import os
 import re
 
-HEADER = "| 기업 | 티어 | 채용 페이지 | ATS | 접근 | 비고 |\n| --- | --- | --- | --- | --- | --- |"
+HEADER = "| 기업 | 채용 페이지 | ATS | 접근 | 비고 |\n| --- | --- | --- | --- | --- |"
 AFFILIATE_NOTE = "\n계열사 행(따로 요청하지 않는다. 그룹 행을 읽을 때 company 이름과 affiliate를 맞추는 데 쓴다):\n"
 # 계열사 행 비고가 "{그룹} 행"으로 시작하지 않는 예외
 PARENT_OVERRIDE = {"토스페이먼츠": "비바리퍼블리카", "네이버클라우드": "네이버"}
@@ -27,7 +27,7 @@ def parse(path, sections):
 		if section not in sections or not line.startswith("| ") or line.startswith("| 기업") or line.startswith("| ---"):
 			continue
 		cells = [c.strip() for c in line.strip().strip("|").split("|")]
-		if len(cells) == 6:
+		if len(cells) == 5:
 			rows.append(cells)
 	return rows
 
@@ -38,12 +38,12 @@ def fmt(cells):
 
 def make(registry, sections, out_dir, max_batches=7):
 	rows = parse(registry, sections)
-	career = [r for r in rows if r[4] in ("api", "fetch", "")]
-	browser = [r for r in rows if r[4] in ("browser", "login")]
-	group_rows = [r for r in rows if r[4] == "group"]
+	career = [r for r in rows if r[3] in ("api", "fetch", "")]
+	browser = [r for r in rows if r[3] in ("browser", "login")]
+	group_rows = [r for r in rows if r[3] == "group"]
 	parent = {}
 	for r in group_rows:
-		m = re.match(r"(\S+) 행", r[5])
+		m = re.match(r"(\S+) 행", r[4])
 		parent[r[0]] = PARENT_OVERRIDE.get(r[0]) or (m.group(1) if m else None)
 	parents = set(parent.values())
 	groups = [r for r in career if r[0] in parents]
