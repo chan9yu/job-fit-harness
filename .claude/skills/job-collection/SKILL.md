@@ -96,7 +96,7 @@ WebFetch는 긴 페이지를 요약하면서 목록 뒷부분을 빠뜨릴 수 �
 ```
 
 - `company`는 레지스트리 표기를 그대로 쓴다. 레지스트리 밖 기업은 공고에 적힌 회사명을 쓰고 `in_registry`를 `false`로 둔다.
-- `affiliate`는 계열사가 섞여 나오는 사이트(그룹 통합 사이트, 토스, 라인)에서 공고의 계열사 이름이다. 그 밖에는 null이다. 계열사가 레지스트리에 따로 행으로 있으면(예: 토스페이먼츠, SK텔레콤) `company`도 그 행 이름으로 쓴다. 없으면 `company`는 읽은 행의 이름이다. fit-reviewer가 `company`로 티어를 찾는다.
+- `affiliate`는 계열사가 섞여 나오는 사이트(그룹 통합 사이트, 토스, 라인)에서 공고의 계열사 이름이다. 그 밖에는 null이다. 계열사가 레지스트리에 따로 행으로 있으면(예: 토스페이먼츠, SK텔레콤) `company`도 그 행 이름으로 쓴다. 없으면 `company`는 읽은 행의 이름이다. fit-reviewer가 `company`와 `affiliate`로 선호 기업 순서와 레지스트리 행 순서를 찾는다.
 - `source`는 `career`, `wanted`, `remember`, `jobplanet`, `saramin`, `zighang`, `jumpit`, `jobkorea`, `linkedin`, `catch`, `rallit` 중 하나다.
 - `company_id`는 플랫폼이 주는 회사 ID(원티드 `company.id`, 사람인 `csn` 등), `business_number`는 사업자등록번호(점핏 `serialNumber`, 리멤버 `registration_no`)다. 목록에 있을 때만 채우고 없으면 null이다. 발굴 모드에서 이름이 같은 회사를 가려낼 때 쓴다.
 - `original_url`은 플랫폼 공고가 자사 채용 페이지 링크를 같이 보여 줄 때 그 링크다.

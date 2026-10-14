@@ -258,6 +258,7 @@ python3 -I .claude/skills/job-hunt/scripts/assemble_report.py --out {출력 경�
 | 특정 사이트를 못 읽는다                   | `.claude/skills/job-collection/references/` 또는 `data/companies.md`    |
 | 직무나 연차를 잘못 읽었다                 | `.claude/skills/resume-profiling/SKILL.md`                              |
 | 기업을 더하거나 빼거나 범위를 옮기고 싶다 | `data/companies.md`의 행을 해당 절로 옮긴다                             |
+| 보고 싶은 기업을 먼저 놓고 싶다           | `resume/preferences.md`의 선호 기업                                     |
 
 ## 데이터 흐름
 
