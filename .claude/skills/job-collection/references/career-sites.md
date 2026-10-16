@@ -131,7 +131,7 @@ curl -s "https://api.ninehire.com/identity-access/homepage/recruitments?companyI
 - 레지스트리 비고의 `companyId`를 쓴다. `count`가 `countPerPage`보다 크면 `page`를 올린다.
 - 연차는 `career.range.over`가 하한이다. `below`가 0이면 상한이 없는 것으로 보고 `max_years`를 null로 둔다. `career.type`이 `irrelevant`면 경력 무관이다.
 - 마감은 `deadlineType`(`until_filled`면 상시)과 `deadlineValue`다.
-- 직군은 `jobGroup.title`이다. 회사마다 값이 다르다("Tech"가 많다).
+- 직군은 `jobGroup.title`이다. 회사마다 값이 다르다("Tech"가 많다). "Tech"처럼 뭉쳐 있으면 `jobTask.title`의 세부 직무(Frontend, Backend 등)로 가른다(2026-10-16 메가존클라우드).
 - 다른 직군: `jobGroup.title`로 거른다. 2026-10-12 응답에서 카카오스타일은 "PO", "MD", "Marketing", "디지털마케팅", "Design & Contents", "Business", "Corporate Services", 지마켓은 "Brand Marketing", "CRM", "Campaign", "Finance", "정산", "패션/잡화", "풀필먼트운영"이었다. 지마켓처럼 직무 단위로 잘게 나뉜 회사는 제목으로도 본다.
 - 공고 링크는 `{채용 사이트 origin}/job_posting/{addressKey}`.
 - 상세 페이지(`/job_posting/{addressKey}`)는 curl과 WebFetch 모두 Vercel 보안 확인 429를 받는다. 상세용 JSON API도 없다. 연차는 목록 API의 `career.range`로 채우고, 기술 스택과 자격요건 문장이 필요하면 browser-scout가 상세를 연다.
@@ -385,7 +385,7 @@ ridicorp.com/career는 RoundHR 사이트로 이동하고 ridicorp.com은 curl에
 GET https://api-prod.roundhr.com/api/site/jobs?code=ridi&q[position_group_id_in][]=9159
 ```
 
-9159가 제품/개발 그룹이다. URL의 대괄호가 curl의 범위 패턴으로 해석되므로 `curl -g`를 붙인다. 경력은 `application_form.career_kind`와 `career_start`다.
+9159가 제품/개발 그룹이다. URL의 대괄호가 curl의 범위 패턴으로 해석되므로 `curl -g`를 붙인다. 경력은 `application_form.career_kind`와 `career_start`다. 공고 링크는 `https://ridi.recruit.roundhr.com/c/{application_form.code}`다. job의 `code`로 만든 `/c/{code}`는 404를 준다.
 
 다른 직군: `q[position_group_id_in][]`를 빼면 전체가 온다(2026-10-12 16건). 응답 `position_group`에 id와 이름이 있고 오늘은 9152 콘텐츠 비즈니스(7건), 9153 경영지원(7건), 8782 디자인(1건), 9159 제품/개발(1건)이었다.
 
@@ -551,7 +551,7 @@ curl -s -A "$UA" -H 'Accept-Language: ko-KR' -X POST https://www.skcareers.com/R
 GET https://talent.hyundai.com/api/rec/AP-HM-FO-02700?hgrCd=1&lang=ko&page=1&pageblock=100&searchSectorList=N2&searchOccupList=211
 ```
 
-`searchSectorList=N2`가 경력, `searchOccupList=211`이 IT 직종이다. SW Development만 보려면 `searchFieldList=K0019`를 더한다. 공고 링크는 `https://talent.hyundai.com/apply/applyView.hc?recuYy={recuYy}&recuType={recuType}&recuCls={recuCls}`다. 상세 API(`AP-HM-FO-02800`)는 curl에 400을 주므로 본문이 필요하면 browser-scout가 연다.
+`searchSectorList=N2`가 경력, `searchOccupList=211`이 IT 직종이다. SW Development만 보려면 `searchFieldList=K0019`를 더한다. 공고 링크는 `https://talent.hyundai.com/apply/applyView.hc?recuYy={recuYy}&recuType={recuType}&recuCls={recuCls}`다. 상세 API(`AP-HM-FO-02800`)는 브라우저 sessionStorage 값을 `X-HKMC-TOKEN` 헤더로 보내야 해서 curl에 400을 준다. 같은 공고가 원티드 회사 59220에 올라오므로 본문은 원티드 `GET https://www.wanted.co.kr/api/v4/jobs/{id}`로 읽는다(2026-10-16 [AVP] 모빌리티 서비스 Frontend Engineer를 387544로 읽었다). 원티드에 없는 공고만 browser-scout가 연다.
 
 다른 직군: `searchOccupList`를 빼면 전 직종이 온다(2026-10-12 경력 39건). 직종 값은 응답의 `secCode`와 `secCodeNm`이고 세부 분야는 `fldCode`와 `fldCodeNm`이다. 코드표 API는 찾지 못했다. 오늘 나온 직종은 07 디자인, 211 IT, 40 연구개발, 104 생산/제조, J0001 사업/기획이었고 `searchOccupList=07,J0001`(쉼표)과 키 반복 모두 5건이 왔다. `product_manager`와 `business_development`는 J0001(세부 경영전략), 디자인 직무군은 07을 본다. 211 IT 안에도 세부 분야 K0018 Service Planning이 있다. 마케팅, 영업, 인사, 재무 코드는 오늘 공고가 없어 미확인이다.
 
@@ -574,6 +574,7 @@ curl -s -A "$UA" -X POST https://recruit.cj.net/recruit/ko/recruit/recruit/searc
 - 공고는 `ds_newRecruitList`에 있다. `arrGubun` A 신입, B 경력.
 - `arrRecBu`로 회사를 고른다: CJ올리브네트웍스 `E10`. 비우면 전체다.
 - 직무 코드는 확인하지 못했다. 응답의 `job_cd_nm`으로 거른다.
+- 상세는 목록의 `gubun`이 1이면 `https://recruit.cj.net/recruit/ko/recruit/recruit/detail.fo?zz_jo_num={zz_jo_num}`, 2이면 `https://recruit.cj.net/recruit/ko/recruit/recruit/bestDetail.fo?direct=N&zz_jo_num={zz_jo_num}`다. 두 경로 모두 curl로 본문이 온다(2026-10-16 `list.fo`의 `goNewDetail` 함수에서 읽음).
 - 다른 직군: 코드표 없음, 필터 빼고 받음. 위 요청에 직무 필터가 없어 전 직무가 온다(2026-10-12 경력 137건). `job_cd_nm`의 개발 밖 값 예시는 서비스기획, 프로덕트 기획, 그래픽디자인, 디자인, Data Analyst, 브랜드마케팅, 디지털 마케팅, 영업, 사업개발, 서비스운영, 인사(채용), 재무/회계, 법무(변호사), 상품기획, 아티스트 MD, 축산MD다. 응답의 `job_family`는 계열사마다 쓰는 법이 달라서(디자인 공고가 영업, 마케팅 공고와 같은 S에 들어 있다) 직군 판단에 쓰지 않는다.
 
 #### KT
@@ -724,6 +725,19 @@ curl -s -X POST https://career.kyobo.co.kr/home -H 'ajax: true' \
 GET https://cdn.contentful.com/spaces/4io3pho3xfqe/environments/master/entries?access_token=gJE2-YuLGf3n7ImhzpEL1sbHr5qiG1z0Rcua580HvAo&content_type=recruit&limit=100
 ```
 
-사이트 JS에 들어 있는 공개 읽기 토큰이다. 공고는 `items[].fields`(title, url은 그리팅 상세). Engineering 분류 id는 `5ooG5CtfKxmOTd8s5y68KI`이고 `&fields.category.sys.id=`로 거른다. 경력은 그리팅 상세 HTML의 `__NEXT_DATA__`에서 읽는다.
+사이트 JS에 들어 있는 공개 읽기 토큰이다. 공고는 `items[].fields`(title, url은 그리팅 상세). Engineering 분류 id는 `5ooG5CtfKxmOTd8s5y68KI`이고 `&fields.category.sys.id=`로 거른다. 경력은 그리팅 상세 HTML의 `__NEXT_DATA__`에서 읽는다. 그리팅 workspace는 927이지만(상세의 `getCareerBootInfo`) 홈이 비공개라 openings API가 0건을 준다. 목록은 계속 Contentful로 받는다.
 
 다른 직군: `fields.category.sys.id`를 빼면 전체가 온다(2026-10-12 8건). 분류 표는 같은 토큰으로 `content_type=job_category`를 받으면 나온다. `product_manager`는 Product `4TEQi1SA9NPPB7zKQaCvO3`, 디자인 직무군은 Design `5wMKFsjLrAMvkdFbMTGaIW`, `data_analyst`는 Data `z0C7zHRrFOaP0a682wdwM`, `marketing`은 Growth/Marketing `205rJvmpnM5DI2ZDtNM24R`, `business_development`는 Business `7LJM4rgqtXRsfI0YY8ABCH`와 Strategy `74yCPztVGMKklgi0YTudz9`, `hr`와 `finance`, `legal`은 Corporate `2WMteppMoB2TUKcKV3wGzS`다.
+
+### 스마일게이트
+
+그룹 통합 사이트다(knockout.js 자체 사이트). 2026-10-16 점검이 끝났고 목록 API가 인증 없이 123건을 줬다.
+
+```bash
+curl -s -X POST https://careers.smilegate.com/api/apply/announce/guest -H 'Content-Type: application/json' \
+  --data '{"careerTypeCd":[],"companyCd":[],"gameGenreCd":[],"hireTypeCd":[],"jobDtlCd":[],"jobMainCd":[],"keyword":null,"pageIndex":1,"pageSize":200,"projectSeq":null,"usreId":null}'
+```
+
+- 공고는 `announce[]`다. 직무는 `jobMainNm`과 `jobDtlNm`(기술/인프라 > 시스템개발 등), 회사는 `companyNm`, 마감은 `endDate`다.
+- 상세는 `GET https://careers.smilegate.com/api/apply/announce/guest/{announceSeq}`다. 자격요건 `qualificationDesc`, 우대사항 `specialDesc`, 그 밖의 역량 `abilityDesc`.
+- 공고 링크는 `https://careers.smilegate.com/apply/announce/view?seq={announceSeq}`.
