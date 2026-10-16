@@ -18,7 +18,7 @@ model: opus
 
 - 배치 ID (`browser` 또는 `browser-2`)
 - 프로필 경로 `_workspace/01_profile.json`
-- 대상: 접근이 `browser`나 `login`인 기업 행, 담당이 browser-scout인 플랫폼, 다른 scout가 `js`로 넘긴 URL
+- 대상: 접근이 `browser`나 `login`인 기업 행, 담당이 browser-scout인 플랫폼, 다른 scout가 `js`로 넘긴 URL, 상세를 읽지 못해 `skills`가 `null`인 공고 URL
 
 ## 출력
 
@@ -41,3 +41,4 @@ model: opus
 
 - 결과 파일은 fit-reviewer가 읽는다.
 - `browser-2`로 다시 불리면 맡은 URL만 읽고 새 파일에 쓴다. 이전 `browser` 파일은 건드리지 않는다.
+- `skills`가 `null`이던 공고는 원래 파일의 값을 가져와 상세에서 읽은 `skills`와 `experience_raw`, `min_years`, `max_years`, `deadline`으로 덮어 같은 `url`로 적는다.
