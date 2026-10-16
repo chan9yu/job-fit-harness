@@ -172,7 +172,14 @@ python3 -I .claude/skills/job-hunt/scripts/make_batches.py --registry data/compa
 
 두 대상을 한 에이전트에 맡기고 출력 파일을 둘 다 프롬프트에 적는다.
 
-모든 완료 알림을 기다린다. 실패한 배치는 한 번 다시 띄우고, 또 실패하면 빼고 진행한다. 그다음 `_workspace/02_postings_career-*.json`의 `unreachable` 중 `reason`이 `js`인 항목이 있으면 browser-scout를 배치 `browser-2`로 한 번 더 띄운다(포그라운드, 출력 `_workspace/02_postings_browser-2.json`). 첫 browser-scout 결과에 `chrome_unavailable`이 있으면 띄우지 않는다.
+모든 완료 알림을 기다린다. 실패한 배치는 한 번 다시 띄우고, 또 실패하면 빼고 진행한다. 그다음 `_workspace/02_postings_career-*.json`에서 아래 두 가지를 모은다. 하나라도 있으면 browser-scout를 배치 `browser-2`로 한 번 더 띄우고 둘 다 맡긴다(포그라운드, 출력 `_workspace/02_postings_browser-2.json`). 첫 browser-scout 결과에 `chrome_unavailable`이 있으면 띄우지 않는다.
+
+- `unreachable` 중 `reason`이 `js`인 항목. browser-scout가 페이지를 열어 공고를 기록한다.
+- `skills`가 `null`인 공고. 상세가 429나 403으로 막혀 목록 값만 적힌 공고다(나인하이어 상세는 curl에 늘 429를 준다). browser-scout가 상세를 열어 `skills`와 경력 원문을 채우고 같은 `url`로 다시 기록한다. fit-reviewer는 같은 URL이면 나중 파일 값을 쓴다. 채우지 못한 공고는 직무와 연차가 맞아도 "상세 미확인" 검토로 남는다.
+
+```bash
+jq -r '.postings[] | select(.skills == null) | [.company, .title, .url] | @tsv' _workspace/02_postings_career-*.json
+```
 
 ## Phase 3: 판정과 회사 검증
 
