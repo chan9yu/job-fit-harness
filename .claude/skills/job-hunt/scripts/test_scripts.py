@@ -91,6 +91,11 @@ def main():
 	assert prefilter.drop_reason(posting("가", "프론트엔드 개발자 (정규직 전환형 인턴)", employment="정규직"), ctx) == (None, "exact")
 	assert prefilter.drop_reason(posting("가", "프론트엔드 개발자 (계약직)", employment="미기재"), dict(ctx, allow_contract=True)) == (None, "exact")
 
+	# 제목에 적힌 회사명은 직무 말로 보지 않는다(바잉스퀘어의 '바잉'). 회사명 밖의 직무 말은 그대로 걸린다
+	assert prefilter.drop_reason(posting("(주)바잉스퀘어", "[바잉스퀘어] Tech Leader", employment="미기재"), ctx) == (None, "generic")
+	assert prefilter.drop_reason(posting("(주)바잉스퀘어", "[바잉스퀘어] 바잉 MD", employment="미기재"), ctx) == ("직무 불일치(merchandiser)", None)
+	assert prefilter.drop_reason(posting("(주)페칭", "글로벌 패션 디자이너 커머스 테크리드", employment="미기재"), ctx) == (None, "generic")
+
 	# 동등역량: 기본은 연차 규칙대로 빼고, --allow-equivalent면 경력 원문에 그 문구가 있는 공고만 남긴다
 	d4 = tempfile.mkdtemp()
 	json.dump(PROFILE, open(os.path.join(d4, "01_profile.json"), "w"), ensure_ascii=False)

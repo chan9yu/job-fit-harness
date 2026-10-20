@@ -47,7 +47,7 @@ ROLE_FAMILIES = {
 }
 # 제목만으로 직무가 애매한 말. 프로필 직무군이 개발, 디자인, 그 밖 중 어디에 속하느냐에 따라 고른다.
 GENERIC = {
-	"dev": ["개발자", "개발", "엔지니어", "engineer", "developer", "software", "sw", "프로그래머"],
+	"dev": ["개발자", "개발", "엔지니어", "engineer", "developer", "software", "sw", "프로그래머", "tech lead", "tech leader", "테크 리드"],
 	"design": ["디자이너", "디자인", "designer", "design"],
 	# 기획자 공고는 "운영 기획자", "IT기획"처럼 앞말이 제각각이라 기획만 있으면 남기고 판정에서 거른다
 	"business": ["매니저", "담당자", "manager", "기획"],
@@ -138,8 +138,12 @@ def generic_words(families):
 	return [w for g in groups for w in GENERIC[g]]
 
 
-def title_verdict(title, profile, own_families):
+def title_verdict(title, profile, own_families, company=None):
 	t = text_key(title)
+	# '[바잉스퀘어] Tech Leader'처럼 제목에 적힌 회사명이 직무 말('바잉')에 걸리지 않게 지운다
+	name = text_key(clean(company)).strip()
+	if name:
+		t = re.sub(re.escape(name).replace(r"\ ", r"\s*"), " ", t)
 	own_words = profile.get("keywords_ko", []) + profile.get("keywords_en", []) + [profile.get("role", ""), profile.get("role_en", "")] + profile.get("adjacent_roles", [])
 	own_words += [w for fam in own_families for w in ROLE_FAMILIES[fam]]
 	if has_any(t, own_words):
@@ -174,7 +178,7 @@ def drop_reason(p, ctx):
 		return "요건 %s년 이상" % p["min_years"], None
 	if p.get("max_years") is not None and p["max_years"] < y - 2:
 		return "요건 %s년 이하" % p["max_years"], None
-	return title_verdict(p.get("title"), ctx["profile"], ctx["families"])
+	return title_verdict(p.get("title"), ctx["profile"], ctx["families"], p.get("company"))
 
 
 def run(workspace, registry_path, today, allow_contract=False, allow_equivalent=False):
