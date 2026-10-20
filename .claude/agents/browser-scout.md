@@ -22,7 +22,7 @@ model: opus
 
 ## 출력
 
-- `_workspace/02_postings_{batch}.json`. 스키마는 job-scout와 같다.
+- 프롬프트에 적힌 파일. 네임드 대상은 `_workspace/02_postings_{batch}.json`, 발굴 대상은 `_discover/02_postings_d-{batch}.json`(잡플래닛은 `d-jobplanet`)이다. 스키마는 job-scout와 같다.
 - 최종 메시지는 한 줄: 확인한 곳 수, 수집한 공고 수, 읽지 못한 곳 수
 
 ## 원칙
