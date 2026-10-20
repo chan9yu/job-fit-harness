@@ -170,10 +170,12 @@ curl -s -X POST https://career-api.rememberapp.co.kr/job_postings/search \
 curl은 HTML과 API 모두 Cloudflare에 막혀 403을 받는다. 브라우저에서는 열린다.
 
 1. 탭에서 `https://www.jobplanet.co.kr/job`을 연다. Cloudflare 확인이 끝날 때까지 기다린다.
-2. 같은 탭에서 `https://www.jobplanet.co.kr/api/v3/job/postings?occupation_level2=11905&years_of_experience={y},{y}&order_by=recent&page=1&page_size=20`으로 이동해 `get_page_text`로 JSON을 읽는다. 11905는 프론트엔드 개발 직무 코드다.
+2. 같은 탭에서 `https://www.jobplanet.co.kr/api/v3/job/postings?occupation_level2=11905&years_of_experience={y},{y}&order_by=recent&page=1&page_size=100`을 fetch로 부른다(`javascript_tool`). 주소로 이동해 `get_page_text`로 읽어도 된다. 11905는 프론트엔드 개발 직무 코드다. 2026-10-20에 5년으로 `total_count` 404건이었고 세 페이지로 300건을 받았다.
 3. `q` 파라미터는 무시되므로 키워드 검색은 안 된다. 프론트엔드가 아니면 1의 화면에서 직무 필터를 골라 바뀐 URL의 `occupation_level2` 값을 읽어 쓴다.
 4. `years_of_experience={y},{y}`가 동작한다(2026-10-07 확인: 4,4로 344건, 필터 없이 534건). `page_size`는 100까지 받는다. 11905 결과에도 Java, C# 같은 일반 개발 공고가 섞이므로 제목으로 다시 거른다.
 5. 응답의 `annual.years`, `annual.maximum_years`(0이면 상한 없음)가 연차, `end_at`이 마감이다. `external_url`이 있으면 `original_url`에 넣는다. 공고 링크는 `https://www.jobplanet.co.kr/job/search?posting_ids%5B%5D={id}`다.
+6. 상세는 같은 탭에서 `https://www.jobplanet.co.kr/api/v1/job/postings/{id}`를 fetch로 부른다. v3 상세 경로는 404다. 다른 사이트로 지원받는 공고는 `outlink_website`에 원래 ATS 주소가, `iframe_url`에 잡코리아 공고 번호가 있다. 이런 공고는 목록의 `annual`이 비어 있으면 상세의 `annual`도 비어 있어서 원래 ATS에서 연차를 읽는다.
+7. `posting_apply_type`이 `jobkorea_inlink`이면 `external_url`이 `https://www.jobkorea.co.kr/Recruit/GI_Read/{id}`이고 curl로 `og:description`을 읽을 수 있다. 2026-10-20에 목록에 연차가 없던 공고 24건을 이렇게 채웠다(모두 경력무관).
 
 ## ATS 검색으로 레지스트리 밖 기업 찾기
 
