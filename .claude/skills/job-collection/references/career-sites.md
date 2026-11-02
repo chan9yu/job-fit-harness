@@ -70,6 +70,7 @@ curl -s "https://boards-api.greenhouse.io/v1/boards/{token}/jobs" \
 ```
 
 - 해외 공고가 섞인 회사(쿠팡, 몰로코, 센드버드)는 위처럼 근무지로 거른다.
+- `absolute_url`은 회사가 Greenhouse에 등록한 채용 페이지 주소에 `gh_jid`를 붙인 값이라 공고가 열리지 않는 회사가 있다(당근은 회사 소개 페이지로 간다). 레지스트리 비고에 공고 링크 형식이 있으면 `id`로 그 주소를 만들어 `url`에 적는다.
 - 부서 목록은 `/v1/boards/{token}/departments`.
 - 상세 본문은 `GET https://boards-api.greenhouse.io/v1/boards/{token}/jobs/{id}`의 `content`(이스케이프된 HTML)다. 연차와 기술은 여기서 읽는다. 연차 필드는 따로 없다.
 - 다른 직군: 부서 이름으로 거른다. 2026-10-12 `/departments`에서 한국 근무 공고가 있던 개발 밖 부서는 쿠팡 "Finance", "Customer Service", "Compliance", "Eats Sales & Business", "Eats Finance & Strategy", 몰로코 "MCM Business Development"였다. 센드버드의 한국 공고는 Engineering과 Security and IT뿐이었다.
