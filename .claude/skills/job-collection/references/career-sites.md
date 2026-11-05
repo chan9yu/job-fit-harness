@@ -54,7 +54,7 @@ curl -sL -A "$UA" "$URL" \
 - `careerType`은 `EXPERIENCED`, `NEW_COMER`, `NOT_MATTER`이고 `careerFrom`, `careerTo`가 연차다. 상세를 열지 않아도 `min_years`, `max_years`를 채울 수 있다. 비어 있는 회사도 있으니 그때는 상세에서 읽는다.
 - `dueDate`가 null이면 상시다.
 - 직군 이름은 회사마다 다르다("기술", "개발", "Tech", "Software", "Backend Engineering"). `group` 값을 한 번 훑어보고 개발 직군을 고른다.
-- 상세 URL은 `{목록 URL의 origin}/ko/o/{openingId}`. 기술 스택은 상세에서 읽는다.
+- 상세 URL은 `{목록 URL의 origin}/ko/o/{openingId}`. 기술 스택은 상세에서 읽는다. 상세 원본 HTML의 `__NEXT_DATA__`에서 `openingsInfo`를 가진 객체의 `.openingsInfo.detail`(HTML)이 본문이다(2026-11-05 무신사, 컬리, 업스테이지, 버킷플레이스, 쏘카). 근무지는 목록 API의 `openingJobPositions[].workspacePlace`다.
 - 그리팅 홈을 공개하지 않은 회사(오늘의집, 쏘카)는 API가 0건을 준다. 기업별 절의 방법을 쓴다.
 - 직군 값이 비어 있는 회사(왓챠)나 직군이 잘게 나뉜 회사가 있다. 그때는 제목으로 거른다.
 - 그룹 통합 workspace(HYBE)는 `workspaceDivision`으로 계열사를 거른다. 레지스트리 비고에 값이 있다.
@@ -121,7 +121,7 @@ curl -s -X POST "https://{tenant}.{wdN}.myworkdayjobs.com/wday/cxs/{tenant}/{sit
 
 ### 나인하이어
 
-목록은 `https://{sub}.ninehire.site/`나 커스텀 도메인이고 상세는 `/job_posting/{addressKey}`다. 사이트는 Vercel 보안 확인 때문에 curl이 429를 받는다. API는 curl로 받는다.
+목록은 `https://{sub}.ninehire.site/`나 커스텀 도메인이고 상세는 `/job_posting/{addressKey}`다. 사이트는 Vercel 보안 확인 때문에 curl이 429를 받는 날이 있다. API는 curl로 받는다.
 
 ```bash
 curl -s "https://api.ninehire.com/identity-access/homepage/recruitments?companyId={uuid}&page=1&countPerPage=20" \
@@ -135,7 +135,7 @@ curl -s "https://api.ninehire.com/identity-access/homepage/recruitments?companyI
 - 직군은 `jobGroup.title`이다. 회사마다 값이 다르다("Tech"가 많다). "Tech"처럼 뭉쳐 있으면 `jobTask.title`의 세부 직무(Frontend, Backend 등)로 가른다(2026-10-16 메가존클라우드).
 - 다른 직군: `jobGroup.title`로 거른다. 2026-10-12 응답에서 카카오스타일은 "PO", "MD", "Marketing", "디지털마케팅", "Design & Contents", "Business", "Corporate Services", 지마켓은 "Brand Marketing", "CRM", "Campaign", "Finance", "정산", "패션/잡화", "풀필먼트운영"이었다. 지마켓처럼 직무 단위로 잘게 나뉜 회사는 제목으로도 본다.
 - 공고 링크는 `{채용 사이트 origin}/job_posting/{addressKey}`.
-- 상세 페이지(`/job_posting/{addressKey}`)는 curl과 WebFetch 모두 Vercel 보안 확인 429를 받는다. 상세용 JSON API도 없다. 연차는 목록 API의 `career.range`로 채우고, 기술 스택과 자격요건 문장이 필요하면 browser-scout가 상세를 연다.
+- 상세 페이지(`/job_posting/{addressKey}`)는 먼저 `curl -s -A "$UA"`로 받는다. 200이면 `__NEXT_DATA__`의 `props.pageProps.jobPosting.content`(HTML)가 본문이고 `recruitment.status`, `endAt`도 같은 곳에 있다(2026-11-05 메가존클라우드, 베스핀글로벌, 레브잇, 에이블리). 429면 Vercel 보안 확인에 막힌 것이다(2026-10-29에는 curl과 WebFetch 모두 429). 상세용 JSON API는 없다. 그때는 연차를 목록 API의 `career.range`로 채우고 `skills`를 null로 두며, 기술 스택과 자격요건 문장은 browser-scout가 상세를 열어 채운다.
 - `companyId`가 없는 새 기업은 browser-scout가 사이트를 열고 `__NEXT_DATA__`의 `props.pageProps.homepageProps.homepage.companyId`를 읽어 `registry_updates`로 남긴다. 나인하이어 홈이 비공개라 이 값이 없으면 공고 상세 페이지의 `props.pageProps.recruitment.companyId`를 읽는다(에이블리). 그다음부터는 job-scout가 API로 읽는다.
 
 ### Workable
