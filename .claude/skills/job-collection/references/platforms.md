@@ -329,5 +329,5 @@ ATS 검색 절의 방법을 직무마다 검색어 여러 개로 돌린다. 검�
 
 - 회사 채용 홈(`https://{sub}.career.greetinghr.com/ko/home` 같은 주소)이 나오면 `references/career-sites.md` 그리팅 절의 `__NEXT_DATA__` 방법으로 그 회사 공고 전체를 읽는다. 누아 홈에서 공고 목록이 읽혔다.
 - 그리팅 상세는 `curl -sL`로 받는다. 경로에 `/ko`가 없으면 301로 넘어간다. 열려 있으면 `__NEXT_DATA__`에서 `[..|objects|select(has("openingId") and has("title"))][0].status`가 `"OPEN"`이고, 닫힌 공고는 404다.
-- 나인하이어 상세는 curl에 Vercel 보안 확인 429가 온다. 열려 있는지는 career-sites.md 나인하이어 절대로 회사의 `companyId`를 얻어 목록 API로 본다. 검색 결과에는 맨파워그룹코리아처럼 다른 회사 공고를 대신 올린 곳도 섞인다.
+- 나인하이어 상세는 curl에 Vercel 보안 확인 429가 오는 날이 있다. 열려 있는지는 career-sites.md 나인하이어 절대로 회사의 `companyId`를 얻어 목록 API로 본다. 검색 결과에는 맨파워그룹코리아처럼 다른 회사 공고를 대신 올린 곳도 섞인다.
 - recruiter.co.kr은 `프론트엔드 경력` 결과 10건 중 jobflex 상세 3개를 career-sites.md recruiter.co.kr 절의 v2 상세 API로 열었다. 프론트엔드 공고 1건은 2024-12-31 마감(`POST_SUBMISSION`)이었고 나머지 둘은 마케팅과 PM 공고였다. 나머지 결과는 회사 홈과 구형 공고 페이지였다.

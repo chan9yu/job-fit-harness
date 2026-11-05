@@ -176,7 +176,7 @@ python3 -I .claude/skills/job-hunt/scripts/make_batches.py --registry data/compa
 
 - `_workspace/02_postings_career-*.json`의 `unreachable` 중 `reason`이 `js`인 항목. browser-scout가 페이지를 열어 공고를 기록한다.
 - `_discover/02_postings_d-*.json`의 `unreachable` 중 `reason`이 `js`인 항목. 발굴 모드 배치와 같은 지시(레지스트리 기업은 건너뛰고, 목록에 연차가 있으면 상세를 열지 않는다)로 기록한다. 대부분 ATS 검색으로 찾은 나인하이어 사이트라 `companyId`를 몰라 curl로 읽지 못한 곳이다.
-- `_workspace/02_postings_career-*.json`에서 `skills`가 `null`인 공고. 상세가 429나 403으로 막혀 목록 값만 적힌 공고다(나인하이어 상세는 curl에 늘 429를 준다). browser-scout가 상세를 열어 `skills`와 경력 원문을 채우고 같은 `url`로 다시 기록한다. fit-reviewer는 같은 URL이면 나중 파일 값을 쓴다. 채우지 못한 공고는 직무와 연차가 맞아도 "상세 미확인" 검토로 남는다.
+- `_workspace/02_postings_career-*.json`에서 `skills`가 `null`인 공고. 상세가 429나 403으로 막혀 목록 값만 적힌 공고다(나인하이어 상세는 curl에 429를 주는 날이 있다). browser-scout가 상세를 열어 `skills`와 경력 원문을 채우고 같은 `url`로 다시 기록한다. fit-reviewer는 같은 URL이면 나중 파일 값을 쓴다. 채우지 못한 공고는 직무와 연차가 맞아도 "상세 미확인" 검토로 남는다.
 
 ```bash
 jq -r '.postings[] | select(.skills == null) | [.company, .title, .url] | @tsv' _workspace/02_postings_career-*.json
