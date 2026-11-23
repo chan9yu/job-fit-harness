@@ -31,6 +31,9 @@
 | 링크드인 | `linkedin`  | fetch   | job-scout     |
 | 캐치     | `catch`     | api     | job-scout     |
 | 잡플래닛 | `jobplanet` | browser | browser-scout |
+| Pathsdog | `pathsdog`  | fetch   | job-scout     |
+
+Pathsdog은 발굴 모드에서만 쓴다. 방법은 발굴 모드 절의 Pathsdog 항목에 있다.
 
 프로그래머스 커리어(career.programmers.co.kr)는 2026-10-07 기준 도메인이 해석되지 않아 뺐다.
 
@@ -307,6 +310,23 @@ GET https://www.rallit.com/api/v1/position?jobGroup=DEVELOPER&job={job}&jobLevel
 - `pageSize`는 100을 받고 `data.totalPage`까지 넘긴다. 정렬 파라미터는 찾지 못했다. 직무 하나가 300건을 넘지 않으니 순서와 상관없이 전부 받는다.
 - 목록 공고에 `jobLevels`(구간), `endedAt`(상시면 9999-12-31), `status.code`(받은 공고는 전부 HIRING)가 있다. 연차 숫자는 목록에 없다.
 - 회사: `companyName`, `companyId`. 공고 링크는 응답의 `url`이다.
+
+### Pathsdog
+
+여러 출처의 개발 공고를 직무별로 모아 보여 주는 사이트다. 2026-11-16에 프론트엔드로 확인했다.
+
+```
+GET https://jobs.pathsdog.com/jobs/frontend
+```
+
+- 서버에서 그린 HTML이라 curl로 읽힌다. 프론트엔드 공고는 `id="curation-web-frontend"` 섹션에 있고 다음 섹션 `id="curation-app-frontend"` 앞에서 끝난다. 같은 페이지의 앱 프론트엔드와 프론트엔드 풀스택 섹션은 읽지 않는다. 2026-11-16에 카드 131개였다.
+- 프론트엔드 밖 직무는 확인하지 않았다. 사이트에 `/jobs/backend`, `/jobs/devops`, `/jobs/security`, `/jobs/product-engineer`, `/jobs/fde` 페이지가 있다. 프로필 `role_family`에 맞는 페이지가 없으면 이 출처를 건너뛴다. 맞는 페이지가 있으면 섹션 `id`를 HTML에서 찾아 쓰고 이 항목에 적는다.
+- 카드마다 `a.job-title`의 href가 `/jobs/{id}-{slug}`이고 `data-product-target-id`가 공고 id다. 카드 텍스트에 회사명, 제목, 경력("경력 무관", "3년 이상"), 근무지, 기술 태그가 있다. `skills`는 카드의 기술 태그로 채운다.
+- 상세 `https://jobs.pathsdog.com/jobs/{id}`는 301로 slug 주소로 넘어간다(`curl -L`). 상세에 경력, 근무지, 고용형태, 기술 요건, "원문 공고 · {도메인}" 링크가 있다. 카드의 경력이 숫자 없이 "경력"이나 "신입/경력"일 때만 상세를 열고, 연 상세의 원문 주소는 `original_url`에 넣는다.
+- `url`은 pathsdog 상세 주소로 적는다.
+- 근무지가 해외인 공고는 기록하지 않는다. 2026-11-16에 131개 중 21개가 미국, 일본, 영국, 캐나다 등이었고 국민연금이나 국내 투자 단계로 회사를 검증할 수 없다. 프로필 `locations`가 있으면 그 지역 공고만 기록한다.
+- 카드의 3분의 1 남짓(2026-11-16에 46개)이 레지스트리 기업이다. 발굴 모드 규칙대로 건너뛴다.
+- robots.txt는 모든 에이전트에 `/api/`와 `/compare`를 막고, 학습용 크롤러 ClaudeBot에는 사이트 전체를 막는다. 이 수집은 사용자 요청으로 읽는 것이라 모든 에이전트 규칙을 따른다. `/api/`와 `/compare`는 요청하지 않고 요청 사이에 0.5초 이상 쉰다.
 
 ### 쓰지 못한 플랫폼
 

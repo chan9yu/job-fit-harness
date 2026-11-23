@@ -154,6 +154,7 @@ python3 -I .claude/skills/job-hunt/scripts/make_batches.py --registry data/compa
 | `d-saramin-jobkorea`       | 사람인, 잡코리아                                                                                             |
 | `d-zighang-catch-linkedin` | 직행, 캐치, 링크드인. 직행은 "발굴 모드" 절, 캐치와 링크드인은 각 플랫폼 절을 따르고 상한만 300건으로 올린다 |
 | `d-ats`                    | 그리팅, 나인하이어, recruiter.co.kr. "발굴 모드" 절의 "ATS 검색 넓히기"를 따른다                             |
+| `d-pathsdog`               | Pathsdog. "발굴 모드" 절의 Pathsdog 항목을 따른다. 프로필 직무에 맞는 페이지가 없으면 띄우지 않는다          |
 
 ```
 배치: {batch} (발굴 모드)
@@ -276,7 +277,7 @@ python3 -I .claude/skills/job-hunt/scripts/assemble_report.py --out {출력 경�
 resume/* ──resume-analyst──▶ _workspace/01_profile.json, 00_scope.json
 네임드:  make_batches.py ──job-scout xN, browser-scout──▶ _workspace/02_postings_*.json
          ──fit-reviewer──▶ _workspace/06_named.md
-발굴:    플랫폼 ──job-scout x5, browser-scout──▶ _discover/02_postings_d-*.json
+발굴:    플랫폼 ──job-scout x6, browser-scout──▶ _discover/02_postings_d-*.json
          ──prefilter.py, vetting_cache.py──▶ 03_candidates.json, 03_to_vet.json
          ──company-vetter xN──▶ 04_vetting_vet-*.json ──merge──▶ _cache/vetting.json
          ──prepare_review.py──▶ 05_review_input.json ──discovery-reviewer──▶ _discover/06_discover.md
@@ -301,7 +302,7 @@ resume/* ──resume-analyst──▶ _workspace/01_profile.json, 00_scope.json
 1. 이력서가 있고 작업 폴더가 없다. 사용자가 "채용공고 찾아줘"라고 한다.
 2. Phase 0에서 메뉴 첫 화면을 띄우고 사용자가 "전부"를 고른다. `00_scope.json`이 생긴다.
 3. Phase 1에서 프로필이 생기고 `_discover/`로 복사된다.
-4. Phase 2에서 네임드 배치 7개, 발굴 배치 5개, browser-scout 1개가 함께 돈다.
+4. Phase 2에서 네임드 배치 7개, 발굴 배치 6개, browser-scout 1개가 함께 돈다.
 5. Phase 3에서 fit-reviewer가 도는 동안 1차 거르기, 국민연금 준비, company-vetter 6개, `prepare_review.py`, discovery-reviewer가 차례로 돈다.
 6. Phase 4에서 `output/2026-10-12.md`가 생긴다. "네임드 기업" 절과 "레지스트리 밖 회사" 절이 있고, 머리 문장에 범위 여섯 개와 공고 수가 있다.
 
